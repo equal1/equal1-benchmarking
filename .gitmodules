@@ -1,0 +1,6 @@
+[submodule "thirdparty/QC-App-Oriented-Benchmarks"]
+	path = thirdparty/QC-App-Oriented-Benchmarks
+	url = git@github.com:equal1/QC-App-Oriented-Benchmarks.git
+[submodule "thirdparty/qscore"]
+	path = thirdparty/qscore
+	url = https://github.com/TNO-Quantum/qscore
