@@ -54,8 +54,8 @@ def run_on_device(
         warnings.warn(
             "Bypassing transpilation step will ignore the optimization_level parameter."
         )
-    print("Running on device:", device.profile.model_dump())
-    print("Noise model:", noise_model)
+    # print("Running on device:", device.profile.model_dump())
+    # print("Noise model:", noise_model)
     runtime_options = {
         "simulation_platform": simulation_platform,
         "execution_options": {
@@ -64,12 +64,12 @@ def run_on_device(
             "optimization_level": optimization_level,
         },
     }
-    print(runtime_options)
+    # print(runtime_options)
 
     jobs = device.run(
         qc, shots=shots, noise_model=noise_model, runtime_options=runtime_options
     )
-    print(jobs)
+    # print(jobs)
     return jobs
 
 
@@ -81,12 +81,11 @@ def get_results_from_jobs(
         job.wait_for_final_state()
         if job.status() == qbraid.JobStatus.FAILED:
             result_json = job.client.get_job_results(job.id)
-            print(result_json)
             # TODO probably should cancel the rest of the jobs
             raise RuntimeError(
                 f"Job failed with status: {job.status()}, error: {result_json['statusText']}"
             )
-        results.append(job.get_result())
+        results.append(job.result())
 
     return results
 

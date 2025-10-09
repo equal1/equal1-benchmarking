@@ -20,7 +20,8 @@ class BernsteinVazirani(Experiment):
         self.shots = shots
         self.device_name = device_name
         self.token = token
-        self.results = []
+        self.job_results = []
+        self.distribtions = []
         self.rng = np.random.default_rng(rng)
         self.results_analysis = {}
         self.runtime_options = runtime_options or {}
@@ -59,7 +60,11 @@ class BernsteinVazirani(Experiment):
         return circuit
 
     def _make_circuit(self, hidden_string):
-        qc = qiskit.QuantumCircuit(self.n_qubits + 1, self.n_qubits)
+        # extra = 0
+        # if self.device_name == "bell1-6":
+        #     if self.n_qubits == 5:
+        #         extra = 1
+        qc = qiskit.QuantumCircuit(self.n_qubits + 1, self.n_qubits)  # + extra)
         qc.x(self.n_qubits)
         qc.h(range(self.n_qubits + 1))
         qc.barrier()
@@ -68,33 +73,41 @@ class BernsteinVazirani(Experiment):
         qc.h(range(self.n_qubits))
         qc.barrier()
         qc.measure(range(self.n_qubits), range(self.n_qubits))
+        # if self.device_name == "bell1-6":
+        #     if qc.num_qubits == 6:
+        #         qc.measure(5, 5)  # need to measure the last ancilla for it to run
         return qc
 
     def analyse_results(self):
         self.results_analysis = {}
-        for hidden_string, result in zip(self.hidden_strings, self.results):
-            percent_success = result.get(hidden_string, 0)
-            self.results_analysis[hidden_string] = percent_success
+        for hidden_string, result in zip(self.hidden_strings, self.distribtions):
+            result_sub = subsystem_counts(result, list(range(self.n_qubits)))
+            if hidden_string in result_sub:
+                self.results_analysis[hidden_string] = result
+        return self.results_analysis
 
     def plot_graph(self, ax, graph_name):
-        if graph_name == "success":
-            self._plot_success(ax)
-        else:
-            raise ValueError(f"Unknown graph name: {graph_name}")
+        probabilities = self.results_analysis[graph_name]
+        strings = sorted(list(probabilities.keys()))
+        freq = [probabilities.get(s, 0) for s in strings]
 
-    def _plot_success(self, ax):
-        if not self.results_analysis:
-            raise ValueError(
-                "No analysis results to plot. Run analyse_results() first."
-            )
-
-        strings = list(self.results_analysis.keys())
-        success_rates = [
-            self.results_analysis[s] / self.shots for s in self.results_analysis
-        ]
-
-        ax.bar(strings, success_rates)
-        ax.set_xlabel("Hidden String")
-        ax.set_ylabel("Success Rate")
+        ax.bar(strings, freq)
+        ax.set_xlabel("Measured String")
+        ax.set_ylabel("Probability of Measurement")
+        ax.bar([graph_name], [probabilities.get(graph_name, 0)], color="orange")
         ax.set_title("Bernstein-Vazirani Success Rates")
         ax.set_ylim(0, 1)
+        return ax
+
+
+def subsystem_counts(counts: dict[str, int], subsystem: list[int]):
+    def selected_state(s: str):
+        substring = "".join([c for i, c in enumerate(s[::-1]) if i in subsystem])
+        return substring[::-1]
+
+    subsystem_count = {}
+    for k, v in counts.items():
+        subsystem_state = selected_state(k)
+        subsystem_count[subsystem_state] = subsystem_count.get(subsystem_state, 0) + v
+
+    return subsystem_count
