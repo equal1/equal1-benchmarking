@@ -8,20 +8,22 @@ class BernsteinVazirani(Experiment):
     def __init__(
         self,
         n_qubits,
-        backend,
+        device_name: str,
         shots=1024,
         rng=None,
         token=None,
         number_of_random_strings_to_test: int = 0,
         strings_to_test: Optional[list[str]] = None,
+        runtime_options=None,
     ):
         self.n_qubits = n_qubits
         self.shots = shots
-        self.backend = backend
+        self.device_name = device_name
         self.token = token
         self.results = []
         self.rng = np.random.default_rng(rng)
         self.results_analysis = {}
+        self.runtime_options = runtime_options or {}
 
         if not ((not number_of_random_strings_to_test) ^ (not strings_to_test)):
             raise ValueError(
