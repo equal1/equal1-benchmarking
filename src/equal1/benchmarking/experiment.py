@@ -1,9 +1,15 @@
-class Experiment:
-    def __init__(self):
-        pass
+from equal1.benchmarking import qbraid_wrapper
+from abc import ABC, abstractmethod
+import qiskit
 
-    def run(self):
-        self.start_jobs()
+
+class Experiment(ABC):
+    shots: int
+    circuits: list[qiskit.QuantumCircuit]
+    device: str
+
+    def run(self, runtime_options=None):
+        self.start_jobs(runtime_options)
         self.collect_results()
 
     def start_jobs(self, n_jobs=10):
@@ -15,11 +21,9 @@ class Experiment:
                 qc=circuit,
                 device=device,
                 shots=self.shots,
-                get_probabilities=False,
                 simulation_platform="CPU",
                 force_bypass_transpilation=False,
                 optimization_level=0,
-                return_transpiled_circuits=False,
             )
             self.jobs.append(job)
         return self.jobs
@@ -30,12 +34,15 @@ class Experiment:
         )
         return self.results
 
+    @abstractmethod
     def plot_graph(self, ax, graph_name):
         pass
 
-    def plot_all_graphs(self):
-        pass
+    # @abstractmethod
+    # def plot_all_graphs(self):
+    #     pass
 
+    @abstractmethod
     def analyse_results(self):
         pass
 

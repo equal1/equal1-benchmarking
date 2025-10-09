@@ -4,7 +4,7 @@ from typing import Optional
 
 import qbraid
 import qiskit
-import rich.progress
+# import rich.progress
 
 
 def convert_to_probabilities(
@@ -24,13 +24,45 @@ def convert_to_probabilities(
     return {state: count / shots for state, count in counts.items()}
 
 
-def get_device(device_name: Optional[str] = None) -> qbraid.QuantumDevice:
+def get_device(device_name: str, simulation: bool) -> qbraid.QuantumDevice:
     provider = qbraid.QbraidProvider()
+    if simulation:
+        noise_model = device_name
+        device_name = "equal1_simulator"
+        return device, noise_model
+
     device = provider.get_device(device_name)
-    return device
+    return device, None
 
 
-def run_circuit(
+def run_on_device(
+    qc: qiskit.QuantumCircuit | list[qiskit.QuantumCircuit],
+    device: qbraid.QuantumDevice,
+    shots: int = 10_000,
+    force_bypass_transpilation=False,
+    optimization_level=0,
+):
+    if force_bypass_transpilation and optimization_level != 0:
+        warnings.warn(
+            "Bypassing transpilation step will ignore the optimization_level parameter."
+        )
+
+    execution_options = {
+        "force_bypass_transpilation": force_bypass_transpilation,
+        "optimization_level": optimization_level,
+    }
+
+    jobs = device.run(
+        qc,
+        shots=shots,
+        runtime_options={
+            "execution_options": execution_options,
+        },
+    )
+    return jobs
+
+
+def run_simulation(
     qc: qiskit.QuantumCircuit | list[qiskit.QuantumCircuit],
     device: qbraid.QuantumDevice,
     shots: int = 10_000,
@@ -38,7 +70,6 @@ def run_circuit(
     simulation_platform="CPU",
     force_bypass_transpilation=False,
     optimization_level=0,
-    return_transpiled_circuits=False,
 ):
     """Run a quantum circuit on a specified qbraid device with an optional noise model.
 
@@ -51,7 +82,6 @@ def run_circuit(
         simulation_platform (str): The simulation platform to use, "GPU" or "CPU". Defaults to "CPU".
         force_bypass_transpilation (bool): If True, bypass the transpilation step. Defaults to False.
         optimization_level (int): The level of circuit optimization the compiler should apply. Defaults to 0.
-        return_transpiled_circuits (bool): If True, return the transpiled circuits along with results. Defaults to False.
 
     Returns:
         dict[str, float] : A dictionary of measurement outcomes and probabilities.

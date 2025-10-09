@@ -15,11 +15,10 @@ class BernsteinVazirani(Experiment):
         number_of_random_strings_to_test: int = 0,
         strings_to_test: Optional[list[str]] = None,
     ):
-        super().__init__()
         self.n_qubits = n_qubits
+        self.shots = shots
         self.backend = backend
         self.token = token
-        self.shots = shots
         self.results = []
         self.rng = np.random.default_rng(rng)
         self.results_analysis = {}
@@ -54,16 +53,18 @@ class BernsteinVazirani(Experiment):
     def _make_oracle(self, circuit, hidden_string):
         for i, bit in enumerate(reversed(hidden_string)):
             if bit == "1":
-                circuit.cx(i, self.n_qubits)
+                circuit.cx(i, self.n_qubits)  # ancilla is the last one
         return circuit
 
     def _make_circuit(self, hidden_string):
         qc = qiskit.QuantumCircuit(self.n_qubits + 1, self.n_qubits)
         qc.x(self.n_qubits)
         qc.h(range(self.n_qubits + 1))
-        oracle = self._make_oracle(qc, hidden_string)
-        qc += oracle
+        qc.barrier()
+        qc = self._make_oracle(qc, hidden_string)
+        qc.barrier()
         qc.h(range(self.n_qubits))
+        qc.barrier()
         qc.measure(range(self.n_qubits), range(self.n_qubits))
         return qc
 
