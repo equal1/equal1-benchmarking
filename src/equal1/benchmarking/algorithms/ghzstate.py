@@ -39,7 +39,8 @@ class GHZStateIndividual(Experiment):
         self.number_of_phases_to_test = number_of_phases or (2 * n_qubits + 2)
         self.runtime_options = runtime_options or {}
 
-        self.phase_sweep = np.linspace(0, 2 * np.pi, self.number_of_phases_to_test)
+        j = np.arange(self.number_of_phases_to_test)
+        self.phase_sweep = np.pi * j / (self.number_of_phases_to_test - 1)
 
         self.circuits = self._make_circuts()
 
