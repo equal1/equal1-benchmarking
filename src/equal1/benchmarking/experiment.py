@@ -21,11 +21,11 @@ class Experiment(ABC):
     ):
         device_name = device_name or self.device_name
         device, noise = qbraid_wrapper.get_device(device_name, simulation=simulate)
-        print(self.runtime_options)
+        # print(self.runtime_options)
         combined_runtime_options = {k: v for k, v in self.runtime_options.items()}
         if runtime_options is not None:
             combined_runtime_options |= runtime_options
-        print(combined_runtime_options)
+        # print(combined_runtime_options)
 
         # self.jobs = []
         # for circuit in self.circuits:
@@ -36,7 +36,7 @@ class Experiment(ABC):
             shots=self.shots,
             runtime_options=combined_runtime_options,
         )
-        print(self.jobs)
+        # print(self.jobs)
         # self.jobs.append(job)
         return self.jobs
 

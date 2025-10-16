@@ -36,11 +36,11 @@ class GHZStateIndividual(Experiment):
         self.job_results = []
         self.distribtions = []
         self.results_analysis = {}
-        self.number_of_phases_to_test = number_of_phases or (2 * n_qubits + 2)
         self.runtime_options = runtime_options or {}
 
+        self.number_of_phases_to_test = number_of_phases or (2 * n_qubits + 2)
         j = np.arange(self.number_of_phases_to_test)
-        self.phase_sweep = np.pi * j / (self.number_of_phases_to_test - 1)
+        self.phase_sweep = np.pi * j / (self.n_qubits + 1)
 
         self.circuits = self._make_circuts()
 
@@ -54,9 +54,10 @@ class GHZStateIndividual(Experiment):
 
     def analyse_results(self):
         p00 = [r["0" * self.n_qubits] for r in self.distribtions[1:]]
-        complex_coefficients = np.exp(1j * self.n_qubits * np.array(self.phase_sweep))
         # https://iopscience.iop.org/article/10.1088/2399-6528/ac1df7
-        i_q = np.abs(np.sum(complex_coefficients * p00)) / (len(self.phase_sweep))
+        # coefficients = np.exp(1j * self.n_qubits * np.array(self.phase_sweep))
+        coefficients = np.exp(1j * self.n_qubits * self.phase_sweep)
+        i_q = np.abs(np.sum((coefficients * p00)) / len(self.phase_sweep))
         p_0 = self.distribtions[0]["0" * self.n_qubits]
         p_1 = self.distribtions[0]["1" * self.n_qubits]
         P = p_0 + p_1
@@ -65,18 +66,6 @@ class GHZStateIndividual(Experiment):
 
     def plot_graph(self, ax, graph_name):
         raise NotImplementedError
-
-    #     probabilities = self.results_analysis[graph_name]
-    #     strings = sorted(list(probabilities.keys()))
-    #     freq = [probabilities.get(s, 0) for s in strings]
-
-    #     ax.bar(strings, freq)
-    #     ax.set_xlabel("Measured String")
-    #     ax.set_ylabel("Probability of Measurement")
-    #     ax.bar([graph_name], [probabilities.get(graph_name, 0)], color="orange")
-    #     ax.set_title("Bernstein-Vazirani Success Rates")
-    #     ax.set_ylim(0, 1)
-    #     return ax
 
 
 def ghz_with_shuttling_top(start, layer):

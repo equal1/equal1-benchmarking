@@ -81,9 +81,8 @@ class BernsteinVazirani(Experiment):
     def analyse_results(self):
         self.results_analysis = {}
         for hidden_string, result in zip(self.hidden_strings, self.distribtions):
-            result_sub = subsystem_counts(result, list(range(self.n_qubits)))
-            if hidden_string in result_sub:
-                self.results_analysis[hidden_string] = result
+            if hidden_string in result:
+                self.results_analysis[hidden_string] = result[hidden_string]
         return self.results_analysis
 
     def plot_graph(self, ax, graph_name):

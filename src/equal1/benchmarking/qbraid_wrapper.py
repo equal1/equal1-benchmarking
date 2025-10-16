@@ -35,6 +35,20 @@ def get_device(
     return provider.get_device(device_name), noise_model
 
 
+def run_circuit(qc, backend, simulate=True, shots=10000, runtime_options=None):
+    device, noise = get_device(backend, simulation=simulate)
+    jobs = run_on_device(
+        qc=qc,
+        device=device,
+        noise_model=noise,
+        shots=shots,
+        runtime_options=runtime_options,
+    )
+    results = get_results_from_jobs(jobs)
+    distributions = get_state_distribution(results, shots, get_probabilities=True)
+    return distributions
+
+
 def run_on_device(
     qc: qiskit.QuantumCircuit | list[qiskit.QuantumCircuit],
     device: qbraid.QuantumDevice,
@@ -43,8 +57,9 @@ def run_on_device(
     runtime_options=None,
 ):
     runtime_options = runtime_options or {}
-    optimization_level = runtime_options.get("optimization_level", 0)
+    optimization_level = runtime_options.get("optimization_level", 1)
     simulation_platform = runtime_options.get("simulation_platform", "AUTO")
+    backend = runtime_options.get("backend", "AUTO")
     # number_of_workers = runtime_options.get("number_of_workers", 1)
 
     force_bypass_transpilation = runtime_options.get(
@@ -56,20 +71,28 @@ def run_on_device(
         )
     # print("Running on device:", device.profile.model_dump())
     # print("Noise model:", noise_model)
+    # print(backend)
     runtime_options = {
         "simulation_platform": simulation_platform,
         "execution_options": {
             # "number_of_workers": number_of_workers,
             "force_bypass_transpilation": force_bypass_transpilation,
             "optimization_level": optimization_level,
+            # "backend": backend,
         },
     }
     # print(runtime_options)
 
     jobs = device.run(
-        qc, shots=shots, noise_model=noise_model, runtime_options=runtime_options
+        qc,
+        shots=shots,
+        noise_model=noise_model,
+        backend=backend,
+        runtime_options=runtime_options,
     )
-    # print(jobs)
+    # test if jobs is iterable
+    if not isinstance(jobs, list):
+        jobs = [jobs]
     return jobs
 
 

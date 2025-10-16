@@ -10,11 +10,15 @@ dependencies = [
     "ipython>=9.4.0",
     "ipywidgets>=8.1.7",
     "matplotlib>=3.10.3",
+    "networkx>=3.5",
+    "pandas>=2.3.3",
     "pylatexenc>=2.10",
     "qbraid>=0.9.10",
     "qiskit>=2.1.1",
+    "qiskit-aer>=0.17.2",
     "rich>=14.1.0",
     "scikit-learn>=1.7.1",
+    "seaborn>=0.13.2",
 ]
 
 [build-system]
