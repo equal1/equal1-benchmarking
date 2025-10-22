@@ -14,7 +14,7 @@ class Experiment(ABC):
         runtime_options = runtime_options or {}
 
         self.start_jobs(self.device_name, simulate, runtime_options)
-        self.collect_results()
+        return self.collect_results()
 
     def start_jobs(
         self, device_name: Optional[str] = None, simulate=True, runtime_options=None
