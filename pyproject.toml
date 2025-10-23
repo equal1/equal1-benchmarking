@@ -15,9 +15,11 @@ dependencies = [
     "pylatexenc>=2.10",
     "qbraid>=0.9.10",
     "qiskit>=2.1.1",
+    "qiskit-aer>=0.17.2",
     "rich>=14.1.0",
     "scikit-learn>=1.7.1",
     "seaborn>=0.13.2",
+    "sympy>=1.14.0",
 ]
 
 [build-system]
