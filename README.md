@@ -37,7 +37,13 @@ Applications
 
 External Benchmarks
 
-[ ]  Application-oriented volumetric benchmarking (additional benchmark)
+[x]  Application-oriented volumetric benchmarking (additional benchmark)
+
+
+Note: for the application-oriented volumetric benchmarking please make sure you also init git submodules:
+```bash
+git submodule update --init --recursive
+```
 
 
 Status of Delay Gate
