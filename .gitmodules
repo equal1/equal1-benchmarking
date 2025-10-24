@@ -1,0 +1,3 @@
+[submodule "thirdparty/QC-App-Oriented-Benchmarks"]
+	path = thirdparty/QC-App-Oriented-Benchmarks
+	url = git@github.com:equal1/QC-App-Oriented-Benchmarks.git
