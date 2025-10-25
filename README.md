@@ -23,7 +23,7 @@ Benchmarking scripts to verify the performance of an Equal1 Quantum Computer
 ### Applications
 
 - [x]  GHZ state
-- [ ]  QAOA for MAX-CUT (QScore)
+- [x]  QAOA for MAX-CUT (QScore)
 - [x]  Bernstein-Vazerani Problem
 - [ ]  3 GHZ states with shuttling
 
