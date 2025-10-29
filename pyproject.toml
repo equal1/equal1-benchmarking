@@ -23,6 +23,12 @@ dependencies = [
     "sympy>=1.14.0",
 ]
 
+[dependency-groups]
+dev = ["ruff>=0.14.2"]
+
+[tool.ruff]
+line-length = 120
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
